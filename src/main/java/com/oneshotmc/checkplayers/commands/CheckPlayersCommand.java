@@ -20,46 +20,42 @@ import java.util.UUID;
 public class CheckPlayersCommand implements CommandExecutor {
 
     private CheckPlayers checkPlayers;
-    public CheckPlayersCommand(CheckPlayers checkPlayers){
+
+    public CheckPlayersCommand(CheckPlayers checkPlayers) {
         this.checkPlayers = checkPlayers;
     }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(!(sender instanceof Player))
+        if (!(sender instanceof Player))
             return true;
-        if(args.length != 1)
+        if (args.length != 1)
             return false;
         Player player = (Player) sender;
         UUID pUUID = player.getUniqueId();
-        switch (args[0]){
-            case "start":
-                //We need to do this because Server#getOnlinePlayers() is unmodifiable
-                List<PlayerLocation> otherPlayers = new ArrayList<>();
-                for(Player onlinePlayer : checkPlayers.getServer().getOnlinePlayers())
-                    otherPlayers.add(new PlayerLocation(onlinePlayer));
-                //We don't want to check ourselves!!!
-                Iterator<PlayerLocation> playerLocationsIterator = otherPlayers.iterator();
-                while(playerLocationsIterator.hasNext()){
-                    PlayerLocation playerLocation = playerLocationsIterator.next();
-                    UUID otherUUID = playerLocation.getPlayer().getUniqueId();
-                    if(player.getUniqueId().equals(otherUUID))
-                        playerLocationsIterator.remove();
-                }
-                if(otherPlayers.size() == 0){
-                    ChatUtil.Types.WARNING.sendMessage("There are no other players to check!", player);
-                }
-                else {
-                    checkPlayers.getPlayersChecking().put(pUUID, new PlayerChecker(player, otherPlayers));
-                    ChatUtil.Types.SUCCESS.sendMessage("Starting to check all players", player);
-                }
-                break;
-            case "stop":
-                checkPlayers.getPlayersChecking().remove(pUUID);
-                ChatUtil.Types.SUCCESS.sendMessage("Stopping checking players",player);
-                break;
-            default:
-                return false;
-        }
+        if (args[0] == "enable" || args[0] == "e") {
+            //We need to do this because Server#getOnlinePlayers() is unmodifiable
+            List<PlayerLocation> otherPlayers = new ArrayList<>();
+            for (Player onlinePlayer : checkPlayers.getServer().getOnlinePlayers())
+                otherPlayers.add(new PlayerLocation(onlinePlayer));
+//                //We don't want to check ourselves!!!
+            Iterator<PlayerLocation> playerLocationsIterator = otherPlayers.iterator();
+            while (playerLocationsIterator.hasNext()) {
+                PlayerLocation playerLocation = playerLocationsIterator.next();
+                UUID otherUUID = playerLocation.getPlayer().getUniqueId();
+                if (player.getUniqueId().equals(otherUUID))
+                    playerLocationsIterator.remove();
+            }
+            if (otherPlayers.size() == 0) {
+                ChatUtil.Types.WARNING.sendMessage("There are no other players to check!", player);
+            } else {
+                checkPlayers.getPlayersChecking().put(pUUID, new PlayerChecker(player, otherPlayers));
+                ChatUtil.Types.SUCCESS.sendMessage("Starting to check all players", player);
+            }
+        } else if (args[0] == "disable" || args[0] == "d") {
+            checkPlayers.getPlayersChecking().remove(pUUID);
+            ChatUtil.Types.SUCCESS.sendMessage("Stopping checking players", player);
+        } else return false;
         return true;
     }
 }
