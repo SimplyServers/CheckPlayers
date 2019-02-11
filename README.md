@@ -3,9 +3,9 @@
 CheckPlayers is a simple tool which allows server admins a quick and easy solution to check what all of the players are doing on the server at any given time.
 
 ### Commands:
-Start checking players - **/checkplayers start**
+Start checking players - **/checkplayers enable**
 
-Stop checking players - **/checkplayers stop**
+Stop checking players - **/checkplayers disable**
 
 ### Permissions:
 Allow players to cycle through players - **checkplayers.use**
