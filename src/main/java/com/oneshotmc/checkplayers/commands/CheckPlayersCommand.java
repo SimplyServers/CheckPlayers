@@ -4,6 +4,8 @@ import com.oneshotmc.checkplayers.CheckPlayers;
 import com.oneshotmc.checkplayers.PlayerChecker;
 import com.oneshotmc.checkplayers.PlayerLocation;
 import com.oneshotmc.checkplayers.util.ChatUtil;
+import de.myzelyam.api.vanish.VanishAPI;
+import de.myzelyam.supervanish.SuperVanish;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -33,7 +35,7 @@ public class CheckPlayersCommand implements CommandExecutor {
             return false;
         Player player = (Player) sender;
         UUID pUUID = player.getUniqueId();
-        if (args[0] == "enable" || args[0] == "e") {
+        if (args[0].equalsIgnoreCase("enable") || args[0].equalsIgnoreCase("e")) {
             //We need to do this because Server#getOnlinePlayers() is unmodifiable
             List<PlayerLocation> otherPlayers = new ArrayList<>();
             for (Player onlinePlayer : checkPlayers.getServer().getOnlinePlayers())
@@ -51,8 +53,12 @@ public class CheckPlayersCommand implements CommandExecutor {
             } else {
                 checkPlayers.getPlayersChecking().put(pUUID, new PlayerChecker(player, otherPlayers));
                 ChatUtil.Types.SUCCESS.sendMessage("Starting to check all players", player);
+                if(checkPlayers.getServer().getPluginManager().getPlugin("SuperVanish").isEnabled() && !VanishAPI.isInvisible(player)){
+                    ChatUtil.Types.NEUTRAL.sendMessage("You are now vanished.", player);
+                    VanishAPI.hidePlayer(player);
+                }
             }
-        } else if (args[0] == "disable" || args[0] == "d") {
+        } else if (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("d")) {
             checkPlayers.getPlayersChecking().remove(pUUID);
             ChatUtil.Types.SUCCESS.sendMessage("Stopping checking players", player);
         } else return false;
