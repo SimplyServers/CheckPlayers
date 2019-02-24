@@ -47,13 +47,17 @@ public class CheckPlayersCommand implements CommandExecutor {
                 UUID otherUUID = playerLocation.getPlayer().getUniqueId();
                 if (player.getUniqueId().equals(otherUUID))
                     playerLocationsIterator.remove();
+                else if (checkVanish() && VanishAPI.canSee(player, playerLocation.getPlayer()))
+                    playerLocationsIterator.remove();
+                else if (playerLocation.getPlayer().isOp())
+                    playerLocationsIterator.remove();
             }
             if (otherPlayers.size() == 0) {
                 ChatUtil.Types.WARNING.sendMessage("There are no other players to check!", player);
             } else {
                 checkPlayers.getPlayersChecking().put(pUUID, new PlayerChecker(player, otherPlayers));
                 ChatUtil.Types.SUCCESS.sendMessage("Starting to check all players", player);
-                if(checkPlayers.getServer().getPluginManager().getPlugin("SuperVanish").isEnabled() && !VanishAPI.isInvisible(player)){
+                if (checkVanish() && !VanishAPI.isInvisible(player)) {
                     ChatUtil.Types.NEUTRAL.sendMessage("You are now vanished.", player);
                     VanishAPI.hidePlayer(player);
                 }
@@ -63,5 +67,9 @@ public class CheckPlayersCommand implements CommandExecutor {
             ChatUtil.Types.SUCCESS.sendMessage("Stopping checking players", player);
         } else return false;
         return true;
+    }
+
+    private boolean checkVanish() {
+        return checkPlayers.getServer().getPluginManager().getPlugin("SuperVanish").isEnabled();
     }
 }
